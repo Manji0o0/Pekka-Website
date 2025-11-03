@@ -1447,15 +1447,19 @@
         document.addEventListener('DOMContentLoaded', function () {
             new Splide('#hero-slider', {
                 type: 'loop',
+                direction: 'ttb',
+                height: '400px',
+                perPage: 2,
+                gap: '0.5rem',
                 autoplay: true,
-                perPage: 1,
             }).mount();
         });
     </script>
     <style>
         .splide__slide img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </body>
