@@ -72,8 +72,8 @@
         // --- CURRENCY CONVERSION GLOBAL STATE & HELPERS ---
         window.exchangeRateTHB = 0; // USD to THB rate
         window.isRateFetched = false;
-        const API_KEY = ""; 
-        const BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+        const API_KEY = "GEMINI_API_KEY";
+        const BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
         /**
          * Formats a number as Thai Baht (THB) currency.
@@ -759,7 +759,7 @@
         /**
          * Processes the user's text query against predefined answers.
          */
-        window.processQuery = function(query, displayQuery) {
+        window.processQuery = async function(query, displayQuery) {
             query = query.toLowerCase().trim();
             const chatInput = document.getElementById('chatbot-input');
 
@@ -771,23 +771,39 @@
                 chatInput.value = '';
             }
 
-            let responseKey = null;
-            
-            if (query.includes(window.getTranslation('faq_price').toLowerCase().split(' ')[0]) || query.includes('price') || query.includes('pricing') || query.includes('ราคา')) {
-                responseKey = 'bot_answer_price';
-            } else if (query.includes(window.getTranslation('faq_shipping').toLowerCase().split(' ')[0]) || query.includes('ship') || query.includes('order') || query.includes('จัดส่ง')) {
-                responseKey = 'bot_answer_shipping';
-            } else if (query.includes(window.getTranslation('faq_contact').toLowerCase().split(' ')[0]) || query.includes('contact') || query.includes('email') || query.includes('ติดต่อ')) {
-                responseKey = 'bot_answer_contact';
-            } else {
-                responseKey = 'bot_sorry';
+            const systemPrompt = "You are a customer service chatbot for PEKKA, a premium fight gear and apparel brand. Your goal is to assist users with their questions about products, sizing, shipping, and returns. Be helpful, friendly, and knowledgeable about MMA and fight gear. You can ask clarifying questions to better understand the user's needs. Do not answer questions that are not related to customer service for PEKKA.";
+
+            const payload = {
+                contents: [{ parts: [{ text: query }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            const url = `${BASE_API_URL}?key=${API_KEY}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    postMessageToUI(text, CHAT_BOT_NAME);
+                } else {
+                    postMessageToUI("I'm sorry, I couldn't find an answer to that question.", CHAT_BOT_NAME);
+                }
+
+            } catch (error) {
+                console.error("Error fetching Gemini response:", error);
+                postMessageToUI("I'm sorry, I'm having trouble connecting to the server. Please try again later.", CHAT_BOT_NAME);
             }
-            
-            // 2. Post the bot's response
-            setTimeout(() => {
-                const responseText = window.getTranslation(responseKey);
-                postMessageToUI(responseText, CHAT_BOT_NAME);
-            }, 500); // Simulate bot typing delay
         }
 
         // Attach event listener for Enter key on the input field
@@ -1172,7 +1188,7 @@
                 <nav class="hidden md:flex space-x-6 font-medium">
                     <a href="#featured" class="text-text-main hover:text-accent transition duration-150" data-i18n="shop">Shop</a>
                     <a href="about.html" class="text-text-main hover:text-accent transition duration-150" data-i18n="about_us">About Us</a>
-                    <a href="contact.html" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
+                    <a href="#contact" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
                 </nav>
 
                 <!-- NEW: Auth/Account Button (Replaces the generic mobile menu button) --><button id="auth-button" onclick="toggleAuthModal()" class="flex items-center space-x-2 p-2 rounded-full hover:bg-bg-secondary transition duration-150 group">
