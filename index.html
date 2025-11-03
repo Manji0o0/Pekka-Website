@@ -1169,7 +1169,8 @@
 
                 <nav class="hidden md:flex space-x-6 font-medium">
                     <a href="#featured" class="text-text-main hover:text-accent transition duration-150" data-i18n="shop">Shop</a>
-                    <!-- Removed Our Mission Link --><a href="#contact" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
+                    <a href="about.html" class="text-text-main hover:text-accent transition duration-150">About Us</a>
+                    <a href="#contact" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
                 </nav>
 
                 <!-- NEW: Auth/Account Button (Replaces the generic mobile menu button) --><button id="auth-button" onclick="toggleAuthModal()" class="flex items-center space-x-2 p-2 rounded-full hover:bg-bg-secondary transition duration-150 group">
@@ -1310,6 +1311,42 @@
 
             <div id="product-grid" class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 <!-- Product cards are dynamically inserted by the JavaScript block above --></div>
+        </div>
+    </section>
+
+    <!-- Collections Section -->
+    <section id="collections" class="py-16 sm:py-24 bg-bg-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-extrabold text-center text-text-main sm:text-5xl uppercase tracking-wider">Collections</h2>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Collection 1 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Gloves" alt="Gloves Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Gloves</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Collection 2 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Apparel" alt="Apparel Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Apparel</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Collection 3 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Protection" alt="Protective Gear Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Protection</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
