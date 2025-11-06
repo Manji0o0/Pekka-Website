@@ -1463,11 +1463,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             new Splide('#hero-slider', {
                 type: 'loop',
-                direction: 'ttb',
-                height: '400px',
-                perPage: 2,
-                gap: '0.5rem',
+                direction: 'ltr', // Horizontal direction
+                height: '60vh', // Responsive height
+                perPage: 1, // Show one slide at a time
                 autoplay: true,
+                cover: true, // Ensures the image covers the slide area
+                arrows: true, // Show navigation arrows
+                pagination: true, // Show pagination dots
             }).mount();
         });
     </script>
@@ -1475,7 +1477,7 @@
         .splide__slide img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
     </style>
 </body>
