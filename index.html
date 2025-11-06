@@ -898,18 +898,14 @@
                 return;
             }
 
-            if (!window.db || !window.userId) {
-                window.showMessage('System error: Database not ready.', 'error');
-                return;
-            }
-
+            const currentCartItems = [...window.cartItems];
             const formData = new FormData();
-            formData.append('user_id', window.userId);
+            formData.append('user_id', window.userId || 'anonymous');
             formData.append('admin_email', window.adminEmail);
             formData.append('timestamp', new Date().toISOString());
             
             let totalTHB = 0;
-            window.cartItems.forEach((item, index) => {
+            currentCartItems.forEach((item, index) => {
                 formData.append(`item_${index}_name`, item.name);
                 formData.append(`item_${index}_quantity`, item.quantity);
                 formData.append(`item_${index}_price_thb`, item.priceTHB_fixed);
@@ -921,30 +917,42 @@
                 const response = await fetch('https://formspree.io/f/xeopdrky', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
-                if (response.ok) {
-                    const cartCollectionPath = `/artifacts/${appId}/users/${window.userId}/cartItems`;
-                    const cartQuery = query(collection(window.db, cartCollectionPath));
-                    const cartSnapshot = await getDocs(cartQuery);
-
-                    const deletePromises = [];
-                    cartSnapshot.forEach((doc) => {
-                        deletePromises.push(deleteDoc(doc.ref));
-                    });
-                    await Promise.all(deletePromises);
-
-                    window.toggleCartModal();
-                    const successMessage = window.getTranslation('order_placed_message', {
-                        'EMAIL': window.adminEmail
-                    });
-                    window.showMessage(successMessage, 'success');
-                } else {
-                    throw new Error('Form submission failed');
+                if (!response.ok) {
+                    throw new Error('Form submission to Formspree failed');
                 }
+
+                // --- Cart Clearing Logic ---
+                // This part will now only run if the database is available.
+                if (window.db && window.userId) {
+                    try {
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        const cartCollectionPath = `/artifacts/${appId}/users/${window.userId}/cartItems`;
+                        const cartQuery = query(collection(window.db, cartCollectionPath));
+                        const cartSnapshot = await getDocs(cartQuery);
+
+                        const deletePromises = [];
+                        cartSnapshot.forEach((doc) => {
+                            deletePromises.push(deleteDoc(doc.ref));
+                        });
+                        await Promise.all(deletePromises);
+                    } catch (dbError) {
+                        console.error("Database Error: Could not clear cart from Firestore, but order was sent.", dbError);
+                        // The user's cart will still be cleared from the UI, so this is a graceful failure.
+                    }
+                }
+
+                // Clear the local cart array and update the UI immediately.
+                window.cartItems = [];
+                updateCartUI();
+
+                window.toggleCartModal();
+                const successMessage = window.getTranslation('order_placed_message', {
+                    'EMAIL': window.adminEmail
+                });
+                window.showMessage(successMessage, 'success');
 
             } catch (e) {
                 console.error("Error during checkout process:", e);
