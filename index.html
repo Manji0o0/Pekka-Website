@@ -36,6 +36,8 @@
             scroll-behavior: smooth;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' data: https://res.cloudinary.com https://placehold.co;">
 </head>
 <body class="bg-bg-main text-text-main font-sans">
 
@@ -70,8 +72,8 @@
         // --- CURRENCY CONVERSION GLOBAL STATE & HELPERS ---
         window.exchangeRateTHB = 0; // USD to THB rate
         window.isRateFetched = false;
-        const API_KEY = ""; 
-        const BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+        const API_KEY = "GEMINI_API_KEY";
+        const BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
         /**
          * Formats a number as Thai Baht (THB) currency.
@@ -757,7 +759,7 @@
         /**
          * Processes the user's text query against predefined answers.
          */
-        window.processQuery = function(query, displayQuery) {
+        window.processQuery = async function(query, displayQuery) {
             query = query.toLowerCase().trim();
             const chatInput = document.getElementById('chatbot-input');
 
@@ -769,23 +771,39 @@
                 chatInput.value = '';
             }
 
-            let responseKey = null;
-            
-            if (query.includes(window.getTranslation('faq_price').toLowerCase().split(' ')[0]) || query.includes('price') || query.includes('pricing') || query.includes('ราคา')) {
-                responseKey = 'bot_answer_price';
-            } else if (query.includes(window.getTranslation('faq_shipping').toLowerCase().split(' ')[0]) || query.includes('ship') || query.includes('order') || query.includes('จัดส่ง')) {
-                responseKey = 'bot_answer_shipping';
-            } else if (query.includes(window.getTranslation('faq_contact').toLowerCase().split(' ')[0]) || query.includes('contact') || query.includes('email') || query.includes('ติดต่อ')) {
-                responseKey = 'bot_answer_contact';
-            } else {
-                responseKey = 'bot_sorry';
+            const systemPrompt = "You are a customer service chatbot for PEKKA, a premium fight gear and apparel brand. Your goal is to assist users with their questions about products, sizing, shipping, and returns. Be helpful, friendly, and knowledgeable about MMA and fight gear. You can ask clarifying questions to better understand the user's needs. Do not answer questions that are not related to customer service for PEKKA.";
+
+            const payload = {
+                contents: [{ parts: [{ text: query }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            const url = `${BASE_API_URL}?key=${API_KEY}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    postMessageToUI(text, CHAT_BOT_NAME);
+                } else {
+                    postMessageToUI("I'm sorry, I couldn't find an answer to that question.", CHAT_BOT_NAME);
+                }
+
+            } catch (error) {
+                console.error("Error fetching Gemini response:", error);
+                postMessageToUI("I'm sorry, I'm having trouble connecting to the server. Please try again later.", CHAT_BOT_NAME);
             }
-            
-            // 2. Post the bot's response
-            setTimeout(() => {
-                const responseText = window.getTranslation(responseKey);
-                postMessageToUI(responseText, CHAT_BOT_NAME);
-            }, 500); // Simulate bot typing delay
         }
 
         // Attach event listener for Enter key on the input field
@@ -1067,7 +1085,7 @@
                 price: 55.56, 
                 priceTHB: 2000, 
                 category: 'Gloves', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761799794/IMG_5712_jlqhpc.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701799794/IMG_5712_jlqhpc.jpg'
             },
             { 
                 id: 102, 
@@ -1075,7 +1093,7 @@
                 price: 55.55, 
                 priceTHB: 2000, 
                 category: 'Protection', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761800318/IMG_5717_mwfa3f.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701800318/IMG_5717_mwfa3f.jpg'
             },
             { 
                 id: 103, 
@@ -1083,7 +1101,7 @@
                 price: 33.33, 
                 priceTHB: 1200, 
                 category: 'Protection', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761800318/IMG_5714_n5vfyy.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701800318/IMG_5714_n5vfyy.jpg'
             },
             { 
                 id: 104, 
@@ -1091,7 +1109,7 @@
                 price: 13.89, 
                 priceTHB: 500, 
                 category: 'Protection', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761800318/IMG_5716_ytrb8h.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701800318/IMG_5716_ytrb8h.jpg'
             },
             { 
                 id: 105, 
@@ -1099,7 +1117,7 @@
                 price: 9.72, 
                 priceTHB: 350, 
                 category: 'Wraps', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761800317/IMG_5713_bqzjlu.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701800317/IMG_5713_bqzjlu.jpg'
             },
             { 
                 id: 106, 
@@ -1107,7 +1125,7 @@
                 price: 55.56, 
                 priceTHB: 2000, 
                 category: 'Gloves', 
-                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1761795041/IMG_5651_me39ef.jpg' 
+                image: 'https://res.cloudinary.com/dv3ey7raw/image/upload/v1701795041/IMG_5651_me39ef.jpg'
             },
         ];
         
@@ -1131,7 +1149,7 @@
                 const productDataString = JSON.stringify(product).replace(/"/g, '&quot;');
 
                 productCard.innerHTML = `
-                    <img src="${product.image}" onerror="this.onerror=null; this.src='https://placehold.co/400x400/f3f4f6/7c3aed?text=PEKKA+${product.category}'" alt="${product.name}" class="rounded-lg w-full object-cover aspect-square mb-4 border border-gray-300">
+                    <img src="${product.image}" alt="${product.name}" class="rounded-lg w-full object-cover aspect-square mb-4 border border-gray-300">
                     <h3 class="text-xl font-bold text-text-main">${product.name}</h3>
                     <p class="text-sm text-accent font-semibold mb-2">${product.category}</p>
                     <div class="flex justify-between items-center mt-3">
@@ -1148,8 +1166,8 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
+            renderProductGrid(); // Render products immediately
             initializeFirebase(); 
-            // The initial rendering of products and cart will now be handled inside onAuthStateChanged
         });
     </script>
 
@@ -1158,7 +1176,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             
             <!-- Logo - Now an image --><a href="#" class="flex-shrink-0">
-                <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/e_background_removal/f_png/v1761882227/IMG_5746_kmzlzq.jpg" alt="PEKKA Logo" class="h-10 w-auto">
+                <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/e_background_removal/f_png/v1701882227/IMG_5746_kmzlzq.jpg" alt="PEKKA Logo" class="h-10 w-auto">
             </a>
 
             <!-- Menu (Hidden on mobile), Language, and Cart --><div class="flex items-center space-x-6">
@@ -1169,7 +1187,8 @@
 
                 <nav class="hidden md:flex space-x-6 font-medium">
                     <a href="#featured" class="text-text-main hover:text-accent transition duration-150" data-i18n="shop">Shop</a>
-                    <!-- Removed Our Mission Link --><a href="#contact" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
+                    <a href="about.html" class="text-text-main hover:text-accent transition duration-150" data-i18n="about_us">About Us</a>
+                    <a href="#contact" class="text-text-main hover:text-accent transition duration-150" data-i18n="contact">Contact</a>
                 </nav>
 
                 <!-- NEW: Auth/Account Button (Replaces the generic mobile menu button) --><button id="auth-button" onclick="toggleAuthModal()" class="flex items-center space-x-2 p-2 rounded-full hover:bg-bg-secondary transition duration-150 group">
@@ -1281,21 +1300,20 @@
         </div>
     </div>
 
-    <!-- Hero Section --><section id="hero" class="relative py-20 md:py-32 overflow-hidden border-b border-gray-300 bg-bg-secondary">
-        <!-- Background Image/Overlay (using a placeholder) --><div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30" style="background-image: url('https://placehold.co/1200x800/d1d5db/7c3aed?text=PEKKA')"></div>
-        
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-            <!-- Title is now handled entirely by JS for coloring --><h1 id="hero-title" class="text-5xl sm:text-7xl font-extrabold text-text-main tracking-tighter uppercase leading-tight">
-                <!-- Content set by translateUI() --></h1>
-            
-            <div class="mt-10 flex justify-center space-x-4">
-                <a href="#featured" class="px-8 py-3 text-xl font-bold rounded-xl text-white bg-accent hover:bg-accent-dark shadow-xl shadow-accent/50 transition duration-300 transform hover:scale-[1.05]" data-i18n="shop_fight_gear">
-                    Shop Fight Gear
-                </a>
-                <a href="#" class="px-8 py-3 text-xl font-bold rounded-xl text-accent bg-bg-main border-2 border-accent hover:bg-bg-secondary transition duration-300" data-i18n="view_all_apparel">
-                    View All Apparel
-                </a>
-            </div>
+    <!-- Hero Section -->
+    <section id="hero-slider" class="splide" aria-label="Top Collections">
+        <div class="splide__track">
+            <ul class="splide__list">
+                <li class="splide__slide">
+                    <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/v1701799794/IMG_5712_jlqhpc.jpg" alt="Boxing Gloves">
+                </li>
+                <li class="splide__slide">
+                    <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/v1701800318/IMG_5717_mwfa3f.jpg" alt="Head Guards">
+                </li>
+                <li class="splide__slide">
+                    <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/v1701795041/IMG_5651_me39ef.jpg" alt="MMA Gloves">
+                </li>
+            </ul>
         </div>
     </section>
 
@@ -1310,6 +1328,42 @@
 
             <div id="product-grid" class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 <!-- Product cards are dynamically inserted by the JavaScript block above --></div>
+        </div>
+    </section>
+
+    <!-- Collections Section -->
+    <section id="collections" class="py-16 sm:py-24 bg-bg-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-extrabold text-center text-text-main sm:text-5xl uppercase tracking-wider">Collections</h2>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Collection 1 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Gloves" alt="Gloves Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Gloves</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Collection 2 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Apparel" alt="Apparel Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Apparel</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Collection 3 -->
+                <div class="group">
+                    <div class="relative overflow-hidden rounded-lg">
+                        <img src="https://placehold.co/600x400/7c3aed/ffffff?text=Protection" alt="Protective Gear Collection" class="transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <h3 class="text-3xl font-extrabold text-white uppercase">Protection</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1338,7 +1392,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-b border-gray-400 pb-8">
                 <!-- Company Logo/Info --><div>
                     <a href="#" class="flex-shrink-0">
-                        <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/e_background_removal/f_png/v1761882227/IMG_5746_kmzlzq.jpg" alt="PEKKA Logo" class="h-10 w-auto">
+                        <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/e_background_removal/f_png/v1701882227/IMG_5746_kmzlzq.jpg" alt="PEKKA Logo" class="h-10 w-auto">
                     </a>
                     <!-- Added data-i18n --><p class="text-gray-600 text-sm mt-3" data-i18n="footer_tagline">Gear that stands the test of the fight.</p>
                 </div>
@@ -1354,7 +1408,7 @@
                     <h4 class="font-bold text-lg mb-3 text-accent" data-i18n="quick_links">Quick Links</h4>
                     <ul class="space-y-2 text-sm">
                         <!-- Added data-i18n --><li><a href="#featured" class="text-gray-600 hover:text-accent transition" data-i18n="all_products">All Products</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-accent transition" data-i18n="about_us">About Us</a></li>
+                        <li><a href="about.html" class="text-gray-600 hover:text-accent transition" data-i18n="about_us">About Us</a></li>
                         <li><a href="#" class="text-gray-600 hover:text-accent transition" data-i18n="sponsorship">Athlete Sponsorship</a></li>
                     </ul>
                 </div>
@@ -1404,5 +1458,27 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new Splide('#hero-slider', {
+                type: 'loop',
+                direction: 'ltr', // Horizontal direction
+                height: '60vh', // Responsive height
+                perPage: 1, // Show one slide at a time
+                autoplay: true,
+                cover: true, // Ensures the image covers the slide area
+                arrows: true, // Show navigation arrows
+                pagination: true, // Show pagination dots
+            }).mount();
+        });
+    </script>
+    <style>
+        .splide__slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </body>
 </html>

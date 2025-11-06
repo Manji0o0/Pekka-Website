@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - PEKKA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-main': '#ffffff',
+                        'bg-secondary': '#f3f4f6',
+                        'accent': '#7c3aed',
+                        'accent-dark': '#6d28d9',
+                        'text-main': '#1f2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-bg-main text-text-main font-sans">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-bg-main/95 backdrop-blur-sm z-20 shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex-shrink-0">
+                <img src="https://res.cloudinary.com/dv3ey7raw/image/upload/e_background_removal/f_png/v1701882227/IMG_5746_kmzlzq.jpg" alt="PEKKA Logo" class="h-10 w-auto">
+            </a>
+            <nav class="hidden md:flex space-x-6 font-medium">
+                <a href="index.html#featured" class="text-text-main hover:text-accent transition duration-150">Shop</a>
+                <a href="about.html" class="text-accent font-bold">About Us</a>
+                <a href="index.html#contact" class="text-text-main hover:text-accent transition duration-150">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative py-20 md:py-32 bg-bg-secondary text-center">
+            <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('https://placehold.co/1200x800/d1d5db/7c3aed?text=PEKKA+Team');"></div>
+            <div class="relative max-w-4xl mx-auto px-4 z-10">
+                <h1 class="text-5xl sm:text-7xl font-extrabold text-text-main tracking-tighter uppercase">About PEKKA</h1>
+                <p class="mt-4 text-xl text-gray-600">Forging Champions, One Piece of Gear at a Time.</p>
+            </div>
+        </section>
+
+        <!-- Our Story Section -->
+        <section class="py-16 sm:py-24 bg-bg-main">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-4xl font-extrabold text-accent sm:text-5xl">Our Story</h2>
+                <p class="mt-6 text-lg text-gray-600 leading-relaxed">
+                    Founded in 2024, PEKKA was born from a passion for combat sports and a desire to create the highest quality gear for fighters of all levels. We believe that the right equipment can make all the difference, and we are dedicated to providing our customers with the tools they need to succeed. Our journey started in a small garage, with a handful of prototypes and a big dream. Today, we are proud to be a leading name in the industry, trusted by professional athletes and aspiring champions around the world.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="py-12 bg-bg-secondary border-t border-gray-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600">&copy; 2025 PEKKA Gear Company. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
